@@ -1,0 +1,59 @@
+default:
+  image: python:$PDM_SYNC_MCVE_DOCKER_TAG
+
+stages:
+- test
+
+.pdm-sync-mcve:
+  parallel:
+    # 30 parallel jobs
+    matrix:
+      - X1: [0, 1, 2]
+        X2: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+  stage: test
+  needs: []
+  tags:
+  - docker
+  script:
+  - set -euo pipefail
+  - python3 -m venv .venv
+  - . .venv/bin/activate
+  - pip install pdm
+  - pip freeze --all | tee pip-freeze-before
+  - pdm info
+  - pdm info --env
+  - SUCCESS=true
+  - pdm sync || SUCCESS=false
+  - pip freeze --all | tee pip-freeze-after
+  - diff pip-freeze-before pip-freeze-after || true
+  - test $SUCCESS = true
+
+3.11-alpine:
+  extends: .pdm-sync-mcve
+  variables:
+    PDM_SYNC_MCVE_DOCKER_TAG: 3.11-alpine
+3.11-slim:
+  extends: .pdm-sync-mcve
+  variables:
+    PDM_SYNC_MCVE_DOCKER_TAG: 3.11-slim
+3.10-alpine:
+  extends: .pdm-sync-mcve
+  variables:
+    PDM_SYNC_MCVE_DOCKER_TAG: 3.10-alpine
+3.10-slim:
+  extends: .pdm-sync-mcve
+  variables:
+    PDM_SYNC_MCVE_DOCKER_TAG: 3.10-slim
+3.9-alpine:
+  extends: .pdm-sync-mcve
+  variables:
+    PDM_SYNC_MCVE_DOCKER_TAG: 3.9-alpine
+3.9-slim:
+  extends: .pdm-sync-mcve
+  variables:
+    PDM_SYNC_MCVE_DOCKER_TAG: 3.9-slim
+
+# pdm-sync-mcve-4:
+#   extends: .pdm-sync-mcve
+# pdm-sync-mcve-5:
+#   extends: .pdm-sync-mcve

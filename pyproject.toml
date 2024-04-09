@@ -1,0 +1,16 @@
+[project]
+name = "pdm-sync-mcve"
+requires-python = ">=3.9"
+version = "0.1"
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm]
+
+[tool.pdm.dev-dependencies]
+dev = [
+  "requests",
+  "pdm",
+]
